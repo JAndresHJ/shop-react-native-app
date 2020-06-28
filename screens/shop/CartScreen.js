@@ -39,7 +39,7 @@ const CartScreen = props => {
           color={Colors.accent}
           title="Order Now"
           disabled={cartItems.length === 0}
-          onPress = {() => {
+          onPress={() => {
             dispatch(ordersActions.addOrder(cartItems, cartTotalAmount));
           }}
         />
@@ -52,6 +52,7 @@ const CartScreen = props => {
             quantity={itemData.item.quantity}
             title={itemData.item.productTitle}
             amount={itemData.item.sum}
+            deletable
             onRemove={() => {
               dispatch(cartActions.removeFromCart(itemData.item.productId));
             }}
