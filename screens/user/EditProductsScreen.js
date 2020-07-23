@@ -34,23 +34,20 @@ const formReducer = (state, action) => {
     }
     return {
       formIsValid: updatedFormIsValid,
-      inputValues: updatedValues,
       inputValidities: updatedValidities,
+      inputValues: updatedValues
     };
   }
   return state;
 };
 
-const EditProductScreen = (props) => {
+const EditProductScreen = props => {
   const prodId = props.navigation.getParam('productId');
-  const editedProduct = useSelector((state) =>
-    state.products.userProducts.find((prod) => prod.id === prodId)
+  const editedProduct = useSelector(state =>
+    state.products.userProducts.find(prod => prod.id === prodId)
   );
   const dispatch = useDispatch();
 
-  // arg1: Reducer function
-  // arg2: Initial state
-  // It returns two values: the state and a dispatch function
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
       title: editedProduct ? editedProduct.title : '',
@@ -70,7 +67,7 @@ const EditProductScreen = (props) => {
   const submitHandler = useCallback(() => {
     if (!formState.formIsValid) {
       Alert.alert('Wrong input!', 'Please check the errors in the form.', [
-        { text: 'Okay ' },
+        { text: 'Okay' }
       ]);
       return;
     }
@@ -78,23 +75,22 @@ const EditProductScreen = (props) => {
       dispatch(
         productsActions.updateProduct(
           prodId,
-          formState.input.values.title,
-          formState.input.values.description,
-          iformState.input.values.mageUrl
+          formState.inputValues.title,
+          formState.inputValues.description,
+          formState.inputValues.imageUrl
         )
       );
     } else {
       dispatch(
         productsActions.createProduct(
-          formState.input.values.title,
-          formState.input.values.description,
-          formState.input.values.imageUrl,
-          +formState.input.values.price
+          formState.inputValues.title,
+          formState.inputValues.description,
+          formState.inputValues.imageUrl,
+          +formState.inputValues.price
         )
       );
     }
     props.navigation.goBack();
-    // The values can change with every key stroke
   }, [dispatch, prodId, formState]);
 
   useEffect(() => {
@@ -114,17 +110,22 @@ const EditProductScreen = (props) => {
         input: inputIdentifier,
       });
     },
-    [inputChangeHandler]
+    [dispatchFormState]
   );
 
   return (
-    <KeyboardAvoidingView style={{flex: 1}} behavior="padding" keyboardVerticalOffset={10}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior="padding"
+      keyboardVerticalOffset={100}
+    >
       <ScrollView>
         <View style={styles.form}>
           <Input
             id="title"
             label="Title"
-            errorText="Please enter a valid title"
+            errorText="Please enter a valid title!"
+            keyboardType="default"
             autoCapitalize="sentences"
             autoCorrect
             returnKeyType="next"
@@ -136,9 +137,8 @@ const EditProductScreen = (props) => {
           <Input
             id="imageUrl"
             label="Image Url"
-            errorText="Enter a valid image URL"
-            autoCapitalize="sentences"
-            autoCorrect
+            errorText="Please enter a valid image url!"
+            keyboardType="default"
             returnKeyType="next"
             onInputChanged={inputChangeHandler}
             initialValue={editedProduct ? editedProduct.imageUrl : ''}
@@ -150,24 +150,23 @@ const EditProductScreen = (props) => {
               id="price"
               label="Price"
               errorText="Enter a valid price"
-              onInputChanged={inputChangeHandler}
               keyboardType="decimal-pad"
-              autoCapitalize="sentences"
-              autoCorrect
               returnKeyType="next"
+              onInputChanged={inputChangeHandler}
               required
-              min={0}
+              min={0.1}
             />
           )}
           <Input
             id="description"
             label="Description"
-            errorText="Please enter a valid description"
-            onInputChanged={inputChangeHandler}
+            errorText="Please enter a valid description!"
+            keyboardType="default"
             autoCapitalize="sentences"
             autoCorrect
             multiline
             numberOfLines={3}
+            onInputChanged={inputChangeHandler}
             initialValue={editedProduct ? editedProduct.description : ''}
             initiallyValid={!!editedProduct}
             required
@@ -179,7 +178,7 @@ const EditProductScreen = (props) => {
   );
 };
 
-EditProductScreen.navigationOptions = (navData) => {
+EditProductScreen.navigationOptions = navData => {
   const submitFn = navData.navigation.getParam('submit');
   return {
     headerTitle: navData.navigation.getParam('productId')
